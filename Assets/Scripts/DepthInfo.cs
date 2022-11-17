@@ -9,33 +9,51 @@ public class DepthInfo : MonoBehaviour
     int[,] basicBackGroundDepth = new int[10, 10];
     int[,] currBackGroundDepth;
 
-    TextMeshProUGUI[] texts;
-    Image[] images = new Image[100];
+    GridLayoutGroup gridLayoutGroup;
+
+    Image[,] images;
+    [SerializeField] GameObject imgPrefab;
 
     [SerializeField] Material masking;
 
-    [SerializeField] int width;
-    [SerializeField] int height;
+    // 해상도 크기
+    int width;
+    int height;
 
+    // 이미지의 크기
+    float imgWidth;
+    float imgHeight;
 
+    void Awake()
+    {
+        width = Setting.Instance.Width;
+        height = Setting.Instance.Height;
 
-    // Start is called before the first frame update
+        imgWidth = Setting.Instance.ImgWidth;
+        imgHeight = Setting.Instance.ImgHeight;
+
+        Vector2 imgSize = new Vector2(imgWidth, imgHeight);
+        GetComponent<RectTransform>().sizeDelta = imgSize;
+        GetComponent<GridLayoutGroup>().cellSize = new Vector2(imgWidth / width, imgHeight / height);
+    }
+
     void Start()
     {
-        texts = GetComponentsInChildren<TextMeshProUGUI>();
-
+        images = new Image[height, width];
         currBackGroundDepth = new int[height, width];
 
+        for (int i = 0; i < height; ++i)
+        {
+            for (int j = 0; j < width; ++j)
+            {
+                GameObject imgPixel = Instantiate(imgPrefab, Vector3.zero, Quaternion.identity, transform);
+                imgPixel.GetComponent<RectTransform>().localPosition = Vector3.zero;
+                images[i, j] = imgPixel.GetComponent<Image>();
+                images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+            }
+        }
 
         Color color = new Color(1f, 0f, 0f, 0.5f);
-
-        for (int i = 0; i < 100; ++i)
-        {
-            images[i] = texts[i].gameObject.transform.parent.GetComponent<Image>();
-            images[i].color = color;
-
-            // images[i].material = masking;
-        }
 
         for (int i = 0; i < 9; ++i)
         {
@@ -116,54 +134,23 @@ public class DepthInfo : MonoBehaviour
             basicBackGroundDepth[i, 9] = 5;
         }
         basicBackGroundDepth[9, 9] = 4;
-
-        ClearText();
-    }
-
-    void ClearText()
-    {
-        for (int i = 0; i < 100; ++i)
-        {
-            texts[i].text = "";
-        }
-    }
-
-    void SyncUI()
-    {
-        for (int i = 0; i < 100; ++i)
-        {
-            texts[i].text = basicBackGroundDepth[i / 10, i % 10].ToString();
-        }
-    }
-
-    public void SyncUI(int[,] arr)
-    {
-        for (int i = 0; i < 100; ++i)
-        {
-            texts[i].text = arr[i / 10, i % 10].ToString();
-        }
-    }
-
-    public void SyncUITrueFalse(int[,] arr)
-    {
-        for (int i = 0; i < 100; ++i)
-        {
-            texts[i].text = basicBackGroundDepth[i / 10, i % 10] > arr[i / 10, i % 10] ? "T" : "F";
-        }
     }
 
     public void SyncMasking(int[,] arr)
     {
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < height; ++i)
         {
-            if (basicBackGroundDepth[i / 10, i % 10] > arr[i / 10, i % 10])
+            for (int j = 0; j < width; ++j)
             {
-                images[i].material = null;
-            }
-            else
-            {
+                if (basicBackGroundDepth[i, j] > arr[i, j])
+                {
+                    images[i, j].material = null;
+                }
+                else
+                {
 
-                images[i].material = masking;
+                    images[i, j].material = masking;
+                }
             }
         }
     }

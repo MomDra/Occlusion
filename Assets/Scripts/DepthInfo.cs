@@ -24,6 +24,9 @@ public class DepthInfo : MonoBehaviour
     float imgWidth;
     float imgHeight;
 
+    // 바닥, 하늘 깊이
+    int groundSkyDepth = 30;
+
     void Awake()
     {
         width = Setting.Instance.Width;
@@ -63,7 +66,7 @@ public class DepthInfo : MonoBehaviour
                 {
                     Debug.Log(i + ", " + j);
 
-                    currBackGroundDepth[i, j] = 8;
+                    currBackGroundDepth[i, j] = 11;
 
                     images[i, j].color = new Color(0f, 1f, 1f, 0.5f);
 
@@ -71,21 +74,25 @@ public class DepthInfo : MonoBehaviour
                     if ((188f / 324f) * (((float)(j) / width * 876f) - 236f) - ((float)i / height * 876f) + 26f > 0f) // 건물 오른쪽 위
                     {
                         images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
                     // (236, 26), (0, 98)
                     else if (72f / (-236f) * (((float)(j) / width * 876f) - 236f) - ((float)i / height * 876f) + 26f > 0f) // 건물 왼쪽 위
                     {
                         images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
                     // (247, 781), (581, 718)
                     else if ((-63f) / 334f * (((float)(j) / width * 876f) - 247f) - ((float)i / height * 876f) + 781f < 0) // 건물 오른쪽 밑
                     {
                         images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
                     // (0, 758), (247, 781)
                     else if (23f / 247f * ((float)(j) / width * 876f) - ((float)i / height * 876f) + 758f < 0) // 건물 왼쪽 밑
                     {
                         images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
 
                 }
@@ -94,10 +101,12 @@ public class DepthInfo : MonoBehaviour
                     if ((float)i / height * 876f <= 595f) // 하늘
                     {
                         images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
                     else // 바닥
                     {
                         images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                        currBackGroundDepth[i, j] = groundSkyDepth;
                     }
 
                     // currBackGroundDepth[i, j] = 30;

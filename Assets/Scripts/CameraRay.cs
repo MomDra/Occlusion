@@ -65,7 +65,7 @@ public class CameraRay : MonoBehaviour
 
 
         // GetComponent<DepthInfo>().SyncUITrueFalse(objectDepth);
-        // depthInfo.SyncMasking(objectDepth);
+        depthInfo.SyncMasking(objectDepth);
     }
 
 }

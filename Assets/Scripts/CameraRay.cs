@@ -6,13 +6,18 @@ using UnityEngine.UI;
 public class CameraRay : MonoBehaviour
 {
     Transform[] gameObjects;
-    int[,] objectDepth = new int[10, 10];
+    int[,] objectDepth;
 
     float halfWidth;
     float halfHeight;
 
     float imgWidth;
     float imgHeight;
+
+    int width;
+    int height;
+
+    DepthInfo depthInfo;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +26,12 @@ public class CameraRay : MonoBehaviour
 
         imgWidth = GetComponent<RectTransform>().sizeDelta.x;
         imgHeight = GetComponent<RectTransform>().sizeDelta.y;
+
+        width = Setting.Instance.Width;
+        height = Setting.Instance.Height;
+        objectDepth = new int[height, width];
+
+        depthInfo = GetComponent<DepthInfo>();
     }
 
     // Update is called once per frame
@@ -29,15 +40,16 @@ public class CameraRay : MonoBehaviour
         halfWidth = Screen.width / 2;
         halfHeight = Screen.height / 2;
 
-        Vector3 rayPosition = new Vector3(halfWidth - imgWidth / 2 + imgWidth / 10 / 2, halfHeight - imgWidth / 2 + imgWidth / 10 / 2, 0f);
+        Vector3 rayPosition;
+        // new Vector3(halfWidth - imgWidth / 2 + imgWidth / width / 2, halfHeight - imgWidth / 2 + imgWidth / height / 2, 0f);
 
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < height; ++i)
         {
-            for (int j = 0; j < 10; ++j)
+            for (int j = 0; j < width; ++j)
             {
                 objectDepth[i, j] = 100; // 기본 100으로 초기화
 
-                rayPosition = new Vector3(halfWidth - imgWidth / 2 + imgWidth / 10 / 2 + j * imgWidth / 10, halfHeight + imgHeight / 2 - imgHeight / 10 / 2 - i * imgHeight / 10);
+                rayPosition = new Vector3(halfWidth - imgWidth / 2 + imgWidth / width / 2 + j * imgWidth / width, halfHeight + imgHeight / 2 - imgHeight / height / 2 - i * imgHeight / height);
                 Ray cameraRay = Camera.main.ScreenPointToRay(rayPosition);
 
                 RaycastHit hit;
@@ -53,7 +65,7 @@ public class CameraRay : MonoBehaviour
 
 
         // GetComponent<DepthInfo>().SyncUITrueFalse(objectDepth);
-        GetComponent<DepthInfo>().SyncMasking(objectDepth);
+        // depthInfo.SyncMasking(objectDepth);
     }
 
 }

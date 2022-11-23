@@ -41,99 +41,70 @@ public class DepthInfo : MonoBehaviour
     {
         images = new Image[height, width];
         currBackGroundDepth = new int[height, width];
+        Color color = new Color(1f, 0f, 0f, 0.5f);
 
         for (int i = 0; i < height; ++i)
         {
             for (int j = 0; j < width; ++j)
             {
+                // images 정보 가져오기
                 GameObject imgPixel = Instantiate(imgPrefab, Vector3.zero, Quaternion.identity, transform);
                 imgPixel.GetComponent<RectTransform>().localPosition = Vector3.zero;
                 images[i, j] = imgPixel.GetComponent<Image>();
-                images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                images[i, j].color = color;
+                images[i, j].material = null;
+
+
+                // 배경 정보 초기화
+                // 직선의 방적식 만들어서 그 점이 직선 오른쪽이면 30 넣어주면 된다, 직선 두점: (560, 213), (581, 718)\
+                // 기울기 y = ax +b, (y2 - y1) / (x2 - x1) * (x - x1) - y + y1 = 0
+
+                if ((505f / 21) * (((float)(j) / width * 876) - 560f) - ((float)i / height * 876) + 213f <= 0f) // 세로선 기준 왼쪽
+                {
+                    Debug.Log(i + ", " + j);
+
+                    currBackGroundDepth[i, j] = 8;
+
+                    images[i, j].color = new Color(0f, 1f, 1f, 0.5f);
+
+                    // (236, 26), (560, 214)
+                    if ((188f / 324f) * (((float)(j) / width * 876f) - 236f) - ((float)i / height * 876f) + 26f > 0f) // 건물 오른쪽 위
+                    {
+                        images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                    }
+                    // (236, 26), (0, 98)
+                    else if (72f / (-236f) * (((float)(j) / width * 876f) - 236f) - ((float)i / height * 876f) + 26f > 0f) // 건물 왼쪽 위
+                    {
+                        images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                    }
+                    // (247, 781), (581, 718)
+                    else if ((-63f) / 334f * (((float)(j) / width * 876f) - 247f) - ((float)i / height * 876f) + 781f < 0) // 건물 오른쪽 밑
+                    {
+                        images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                    }
+                    // (0, 758), (247, 781)
+                    else if (23f / 247f * ((float)(j) / width * 876f) - ((float)i / height * 876f) + 758f < 0) // 건물 왼쪽 밑
+                    {
+                        images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                    }
+
+                }
+                else // 세로선 기준 오른쪽
+                {
+                    if ((float)i / height * 876f <= 595f) // 하늘
+                    {
+                        images[i, j].color = new Color(0f, 0f, 1f, 0.5f);
+                    }
+                    else // 바닥
+                    {
+                        images[i, j].color = new Color(1f, 0f, 0f, 0.5f);
+                    }
+
+                    // currBackGroundDepth[i, j] = 30;
+                    // images[i, j].material = masking;
+                }
             }
         }
-
-        Color color = new Color(1f, 0f, 0f, 0.5f);
-
-        for (int i = 0; i < 9; ++i)
-        {
-            basicBackGroundDepth[i, 0] = 5;
-        }
-        basicBackGroundDepth[9, 0] = 4;
-
-        for (int i = 0; i < 8; ++i)
-        {
-            basicBackGroundDepth[i, 1] = 6;
-        }
-        basicBackGroundDepth[8, 1] = 5;
-        basicBackGroundDepth[9, 1] = 4;
-
-        for (int i = 0; i < 7; ++i)
-        {
-            basicBackGroundDepth[i, 2] = 20;
-        }
-        basicBackGroundDepth[7, 2] = 7;
-        basicBackGroundDepth[8, 2] = 5;
-        basicBackGroundDepth[9, 2] = 4;
-
-        for (int i = 0; i < 7; ++i)
-        {
-            basicBackGroundDepth[i, 3] = 20;
-        }
-        basicBackGroundDepth[7, 3] = 17;
-        basicBackGroundDepth[8, 3] = 5;
-        basicBackGroundDepth[9, 3] = 4;
-
-        for (int i = 0; i < 7; ++i)
-        {
-            basicBackGroundDepth[i, 4] = 20;
-        }
-        basicBackGroundDepth[7, 4] = 17;
-        basicBackGroundDepth[8, 4] = 5;
-        basicBackGroundDepth[9, 4] = 4;
-
-        for (int i = 0; i < 7; ++i)
-        {
-            basicBackGroundDepth[i, 5] = 20;
-        }
-        basicBackGroundDepth[7, 5] = 17;
-        basicBackGroundDepth[8, 5] = 5;
-        basicBackGroundDepth[9, 5] = 4;
-
-        for (int i = 0; i < 7; ++i)
-        {
-            basicBackGroundDepth[i, 6] = 20;
-        }
-        basicBackGroundDepth[7, 6] = 17;
-        basicBackGroundDepth[8, 6] = 5;
-        basicBackGroundDepth[9, 6] = 4;
-
-        for (int i = 0; i < 6; ++i)
-        {
-            basicBackGroundDepth[i, 7] = 20;
-        }
-        basicBackGroundDepth[6, 7] = 7;
-        basicBackGroundDepth[7, 7] = 7;
-        basicBackGroundDepth[8, 7] = 5;
-        basicBackGroundDepth[9, 7] = 4;
-
-        for (int i = 0; i < 8; ++i)
-        {
-            if (i >= 2 && i <= 7)
-                basicBackGroundDepth[i, 8] = 6;
-            else
-                basicBackGroundDepth[i, 8] = 20;
-        }
-        basicBackGroundDepth[8, 8] = 5;
-        basicBackGroundDepth[9, 8] = 4;
-
-
-        basicBackGroundDepth[0, 9] = 20;
-        for (int i = 1; i < 9; ++i)
-        {
-            basicBackGroundDepth[i, 9] = 5;
-        }
-        basicBackGroundDepth[9, 9] = 4;
     }
 
     public void SyncMasking(int[,] arr)
@@ -142,7 +113,7 @@ public class DepthInfo : MonoBehaviour
         {
             for (int j = 0; j < width; ++j)
             {
-                if (basicBackGroundDepth[i, j] > arr[i, j])
+                if (currBackGroundDepth[i, j] > arr[i, j])
                 {
                     images[i, j].material = null;
                 }

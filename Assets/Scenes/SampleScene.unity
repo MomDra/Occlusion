@@ -578,6 +578,7 @@ MonoBehaviour:
   height: 50
   imgWidth: 700
   imgHeight: 700
+  targetObject: {fileID: 1906603625}
 --- !u!4 &1000702881
 Transform:
   m_ObjectHideFlags: 0
@@ -816,3 +817,8 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!4 &1906603625 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3110074637706563629, guid: 6df639913147c224ea5b9ceda94435ae, type: 3}
+  m_PrefabInstance: {fileID: 583128593}
+  m_PrefabAsset: {fileID: 0}

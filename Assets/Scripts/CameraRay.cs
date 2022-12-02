@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class CameraRay : MonoBehaviour
 {
+    Transform target;
     Transform[] gameObjects;
     int[,] objectDepth;
 
@@ -32,6 +33,8 @@ public class CameraRay : MonoBehaviour
         objectDepth = new int[height, width];
 
         depthInfo = GetComponent<DepthInfo>();
+
+        target = Setting.Instance.TargetObject;
     }
 
     // Update is called once per frame
@@ -55,9 +58,9 @@ public class CameraRay : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(cameraRay, out hit, 100f))
                 {
-                    objectDepth[i, j] = (int)(hit.transform.position.z - Camera.main.transform.position.z);
+                    objectDepth[i, j] = (int)(target.position.z - Camera.main.transform.position.z);
 
-                    Debug.Log(hit.transform.position.z - Camera.main.transform.position.z);
+                    Debug.Log(target.position.z - Camera.main.transform.position.z);
                     Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100f, Color.red);
                 }
             }
@@ -67,5 +70,4 @@ public class CameraRay : MonoBehaviour
         // GetComponent<DepthInfo>().SyncUITrueFalse(objectDepth);
         depthInfo.SyncMasking(objectDepth);
     }
-
 }

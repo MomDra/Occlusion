@@ -25,6 +25,11 @@ public class Setting : MonoBehaviour
     public float ImgWidth { get => imgWidth; }
     public float ImgHeight { get => imgHeight; }
 
+    [SerializeField]
+    Transform targetObject;
+
+    public Transform TargetObject { get => targetObject; }
+
     private void Awake()
     {
         if (instance == null)

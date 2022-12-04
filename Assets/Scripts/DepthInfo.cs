@@ -29,6 +29,16 @@ public class DepthInfo : MonoBehaviour
     int buildingFrontDepth = 11;
     int buildingBackDepth = 14;
 
+    public Vector3 leftUpImgPos { get => images[0, 0].transform.position; }
+    public Vector3 rightDownImgPos { get => images[height - 1, width - 1].transform.position; }
+
+    Transform targetPos;
+
+    int prevX1;
+    int prevY1;
+    int prevX2;
+    int prevY2;
+
     void Awake()
     {
         width = Setting.Instance.Width;
@@ -40,10 +50,9 @@ public class DepthInfo : MonoBehaviour
         Vector2 imgSize = new Vector2(imgWidth, imgHeight);
         GetComponent<RectTransform>().sizeDelta = imgSize;
         GetComponent<GridLayoutGroup>().cellSize = new Vector2(imgWidth / width, imgHeight / height);
-    }
 
-    void Start()
-    {
+        targetPos = Setting.Instance.TargetObject.transform;
+
         images = new Image[height, width];
         currBackGroundDepth = new int[height, width];
         crashArea = new bool[height, width];
@@ -177,6 +186,11 @@ public class DepthInfo : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+
+    }
+
     public void SyncMasking(int[,] arr)
     {
         for (int i = 0; i < height; ++i)
@@ -200,9 +214,61 @@ public class DepthInfo : MonoBehaviour
         }
     }
 
+    public void SyncMasking(int x1, int y1, int x2, int y2)
+    {
+        float targetDepth = targetPos.position.z - Camera.main.transform.position.z;
+
+        Debug.Log("targetDepth: " + targetDepth);
+        Debug.Log($"x1: {x1}, y1: {y1}, x2: {x2}, y2: {y2}");
+
+
+        for (int i = y1; i < x1 - prevX1; ++i)
+        {
+
+        }
+
+        for (int i = y1; i < y2; ++i)
+        {
+            for (int j = x1; j < x2; ++j)
+            {
+                if (currBackGroundDepth[i, j] > targetDepth)
+                {
+                    if (images[i, j].material != null)
+                        images[i, j].material = null;
+
+                }
+                else
+                {
+                    if (crashArea[i, j])
+                    {
+                        if (targetDepth >= buildingFrontDepth && targetDepth < buildingBackDepth)
+                        {
+                            Debug.Log("충돌!" + targetDepth);
+                        }
+                    }
+
+                    images[i, j].material = masking;
+
+                    Debug.Log("???");
+                }
+            }
+        }
+
+        prevX1 = x1;
+        prevX2 = x2;
+        prevY1 = y1;
+        prevY2 = y2;
+    }
+
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log(images[0, 0].transform.position);
+            Debug.Log(images[0, width - 1].transform.position);
+            Debug.Log(images[height - 1, 0].transform.position);
+            Debug.Log(images[height - 1, width - 1].transform.position);
+        }
     }
 }

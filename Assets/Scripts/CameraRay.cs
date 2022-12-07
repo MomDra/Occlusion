@@ -54,13 +54,14 @@ public class CameraRay : MonoBehaviour
 
                 rayPosition = new Vector3(halfWidth - imgWidth / 2 + imgWidth / width / 2 + j * imgWidth / width, halfHeight + imgHeight / 2 - imgHeight / height / 2 - i * imgHeight / height);
                 Ray cameraRay = Camera.main.ScreenPointToRay(rayPosition);
+                // Debug.DrawRay(cameraRay.origin, cameraRay.direction * 1000f, Color.red);
 
                 RaycastHit hit;
                 if (Physics.Raycast(cameraRay, out hit, 100f))
                 {
                     objectDepth[i, j] = (int)(target.position.z - Camera.main.transform.position.z);
 
-                    Debug.Log(target.position.z - Camera.main.transform.position.z);
+                    // Debug.Log(target.position.z - Camera.main.transform.position.z);
                     Debug.DrawRay(cameraRay.origin, cameraRay.direction * 100f, Color.red);
                 }
             }

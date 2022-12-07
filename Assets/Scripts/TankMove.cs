@@ -22,7 +22,9 @@ public class TankMove : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 moveVec = new Vector3(horizontalInput * 5, 0f, verticalInput);
-        rigid.MovePosition(rigid.position + moveVec * Time.deltaTime);
+        rigid.MovePosition(rigid.position + transform.forward * verticalInput * 5 * Time.deltaTime);
+
+        transform.Rotate(Vector3.up, horizontalInput * 3f);
 
 
         // if (rigid.position.x < 9.5f)

@@ -39,8 +39,17 @@ public class DepthInfo : MonoBehaviour
     int prevX2;
     int prevY2;
 
+    [SerializeField]
+    Serial serial;
+    bool U;
+    bool D;
+    bool a;
+
     void Awake()
     {
+        U = false;
+        D = false;
+
         width = Setting.Instance.Width;
         height = Setting.Instance.Height;
 
@@ -67,7 +76,7 @@ public class DepthInfo : MonoBehaviour
                 imgPixel.GetComponent<RectTransform>().localPosition = Vector3.zero;
                 images[i, j] = imgPixel.GetComponent<Image>();
                 images[i, j].color = color;
-                images[i, j].material = null;
+                images[i, j].material = masking;
                 crashArea[i, j] = true;
 
                 float mappedX = (float)j / width * 876;
@@ -186,11 +195,6 @@ public class DepthInfo : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-
-    }
-
     public void SyncMasking(int[,] arr)
     {
         for (int i = 0; i < height; ++i)
@@ -218,13 +222,20 @@ public class DepthInfo : MonoBehaviour
     {
         float targetDepth = targetPos.position.z - Camera.main.transform.position.z;
 
-        Debug.Log("targetDepth: " + targetDepth);
-        Debug.Log($"x1: {x1}, y1: {y1}, x2: {x2}, y2: {y2}");
+        // Debug.Log("targetDepth: " + targetDepth);
+        // Debug.Log($"x1: {x1}, y1: {y1}, x2: {x2}, y2: {y2}");
 
+        bool k = false;
 
-        for (int i = y1; i < x1 - prevX1; ++i)
+        for (int i = prevY1; i < prevY2; ++i)
         {
-
+            for (int j = prevX1; j < prevX2; ++j)
+            {
+                if (i < y1 || i >= y2 || j < x1 || j >= x2)
+                {
+                    images[i, j].material = masking;
+                }
+            }
         }
 
         for (int i = y1; i < y2; ++i)
@@ -233,9 +244,7 @@ public class DepthInfo : MonoBehaviour
             {
                 if (currBackGroundDepth[i, j] > targetDepth)
                 {
-                    if (images[i, j].material != null)
-                        images[i, j].material = null;
-
+                    images[i, j].material = null;
                 }
                 else
                 {
@@ -243,13 +252,15 @@ public class DepthInfo : MonoBehaviour
                     {
                         if (targetDepth >= buildingFrontDepth && targetDepth < buildingBackDepth)
                         {
-                            Debug.Log("충돌!" + targetDepth);
+                            if (U == false)
+                                StartCoroutine(UCoroutine());
+                            k = true;
                         }
                     }
 
                     images[i, j].material = masking;
 
-                    Debug.Log("???");
+                    // Debug.Log("???");
                 }
             }
         }
@@ -258,6 +269,12 @@ public class DepthInfo : MonoBehaviour
         prevX2 = x2;
         prevY1 = y1;
         prevY2 = y2;
+
+        if (k == false)
+        {
+            if (D == false) StartCoroutine(DCoroutine());
+        }
+        if (a == false) StartCoroutine(DepthCoroutine(targetDepth));
     }
 
     // Update is called once per frame
@@ -270,5 +287,43 @@ public class DepthInfo : MonoBehaviour
             Debug.Log(images[height - 1, 0].transform.position);
             Debug.Log(images[height - 1, width - 1].transform.position);
         }
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            serial.U();
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            serial.D();
+        }
     }
+
+    IEnumerator UCoroutine()
+    {
+        U = true;
+        serial.U();
+        Debug.Log("충돌 전송");
+        yield return new WaitForSeconds(1f);
+        U = false;
+    }
+
+    IEnumerator DCoroutine()
+    {
+        D = true;
+        serial.D();
+        Debug.Log("충돌 전송x");
+        yield return new WaitForSeconds(1f);
+        D = false;
+    }
+
+    IEnumerator DepthCoroutine(float depth)
+    {
+        a = true;
+        Debug.Log(depth);
+        yield return new WaitForSeconds(1f);
+        a = false;
+    }
+
+
 }

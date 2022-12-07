@@ -1,18 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using System;
-using System.Text;
 using System.IO.Ports;
 using UnityEngine;
 
 public class Serial : MonoBehaviour
 {
-    SerialPort sp = new SerialPort("COM4", 115200, Parity.None, 8, StopBits.None);     //시리얼 포트 열어주기
+    SerialPort sp = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.None);     //시리얼 포트 열어주기
     string recv_text = "";
 
-    string tmp = "a";
-
-    byte[] buffer;
+    public int[] prev = new int[3];
+    public int[] curr = new int[3];
 
 
     // Start is called before the first frame update
@@ -20,52 +17,83 @@ public class Serial : MonoBehaviour
     {
         sp.Open();              //포트 열어줌
         sp.ReadTimeout = 100;
-        sp.WriteTimeout = 100;
 
-
-        buffer = Encoding.Default.GetBytes(tmp);
-
-        for (int i = 0; i < buffer.Length; ++i)
+        if (sp.IsOpen)          //포트 열리면
         {
-            Debug.Log(buffer[i]);
+            try
+            {
+                recv_text = sp.ReadLine();
+
+            }
+            catch (System.Exception e)
+            {
+                print(e);
+                // sp.Close();
+                throw;
+
+            }
         }
 
-        buffer = new byte[2];
-        buffer[0] = 97;
-        buffer[1] = 0;
+        string[] split = recv_text.Split(',');
+
+
+
+        for (int i = 0; i < 3; ++i)
+        {
+            // prev[i] = int.Parse(split[i]);
+            curr[i] = int.Parse(split[i]);
+        }
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            sp.Write(buffer, 0, 2);
-        }
-
-        if (sp.IsOpen)
+        if (sp.IsOpen)          //포트 열리면
         {
             try
             {
                 recv_text = sp.ReadLine();
-                Debug.Log(recv_text);
+
             }
             catch (System.Exception e)
             {
                 print(e);
+                // sp.Close();
+                throw;
+
             }
-
-
         }
 
+        // Debug.LogWarning(recv_text);
+        set(recv_text);
+
+
     }
 
-    void foo()
+
+
+    void set(string text)
     {
-        recv_text = sp.ReadLine();
+        string[] split = text.Split(',');
 
-        Debug.Log(recv_text);
+        for (int i = 0; i < 3; ++i)
+        {
+            //  prev[i] = curr[i];
+            // Debug.Log(split[i]);
+            curr[i] = int.Parse(split[i]);
+        }
     }
 
+    public void U()
+    {
+        sp.Write("u");
+        Debug.Log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+    }
+
+    public void D()
+    {
+        sp.Write("d");
+        Debug.Log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+    }
 }
